@@ -1,0 +1,51 @@
+1 Temp_Humi_NodeMCU
+-------------------
+Channel ID: 1642597
+Field 1: Temp
+Field 2: Humi
+
+Write API Key: MEYECQ4OREXM0UI8
+Read API Keys: 26NFYGCQM1NPIEHQ
+
+Write a Channel Feed: GET https://api.thingspeak.com/update?api_key=MEYECQ4OREXM0UI8&field1=0
+Read a Channel Feed : GET https://api.thingspeak.com/channels/1642597/feeds.json?results=2
+
+-------------------
+2 DHT11_mqtt
+-------------------
+Channel ID: 1676344
+Field 1: temp
+Field 2: humi
+
+Write API Key: IYSJLPGNGEWT50ET
+Read API Keys: OEHIFCGG1U83YE16
+
+Write a Channel Feed: GET https://api.thingspeak.com/update?api_key=IYSJLPGNGEWT50ET&field1=0
+Read a Channel Feed : GET https://api.thingspeak.com/channels/1676344/feeds.json?results=2
+
+MQTT Credentials
+Client ID: OwAEJxcALRsHLhk1Lw4EFT0
+Username: OwAEJxcALRsHLhk1Lw4EFT0
+Password: R/FSXgDznvRzAI14ZViO+DhB
+
+-------------------
+3 PZEM16 nodeMCU
+-------------------
+Channel ID: 1657182
+Field 1: U
+Field 2: I
+Field 3: P
+Field 4: Wh
+Field 5: f
+Field 6: pf
+
+Write API Key: VS8GURGEOFW7UCLB
+Read API Keys: MK3XVRGPXLQNRXG5
+
+Write a Channel Feed: GET https://api.thingspeak.com/update?api_key=VS8GURGEOFW7UCLB&field1=0
+Read a Channel Feed : GET https://api.thingspeak.com/channels/1657182/feeds.json?api_key=MK3XVRGPXLQNRXG5&results=2
+
+MQTT Credentials
+Client ID: FjkAITABACs4LwwFLQktMAU
+Username: FjkAITABACs4LwwFLQktMAU
+Password: Y3M/xtbzXKYQThv+baDDEp0w

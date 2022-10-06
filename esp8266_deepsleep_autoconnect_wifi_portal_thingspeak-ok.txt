@@ -1,0 +1,131 @@
+#include <DHT.h>
+//wifi autoconnect and portal
+#include <ESP8266WiFi.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>         // https://github.com/tzapu/WiFiManager
+//one-wire for sensor
+#include <Wire.h>
+#include "DHT.h"
+
+// khai bao bien cho sensor
+#define DHTPIN D2 
+#define SOIL_MOIST_1_PIN A0
+//#define DHTTYPE DHT21   // DHT 21 (AM2301)
+#define DHTTYPE DHT11   // DHT 11
+//#define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
+DHT dht(DHTPIN, DHTTYPE);
+
+float humi; 
+float temp;
+
+// khai bao cho web server de cai dat SSID
+// Set web server port number to 80
+WiFiServer server(80);
+
+// Variable to store the HTTP request
+String header;
+
+
+//WiFiSetting
+//const char* ssid      = "VIETTEL B1502";
+//const char* password  = "0984672555";
+
+WiFiClient client;
+
+//ThingSpeakSetting
+const int channelID    = 1642597; // Enter Channel ID;
+String writeAPIKey    = "MEYECQ4OREXM0UI8";
+const char* server_api    = "api.thingspeak.com";
+
+//void connect() {
+//  WiFi.disconnect();
+//  delay(10);
+//  Serial.print("Connecting to ");
+//  Serial.println(ssid);
+//  WiFi.begin(ssid, password);
+//  while (WiFi.status() != WL_CONNECTED) {
+//   delay(500);
+//    Serial.print(".");
+//  }
+//  Serial.println("");
+//  Serial.print("NodeMcu connected to wifi...");
+//}
+
+void thingConnect() {
+  if (client.connect(server_api, 80)) {
+    String body = "field1=" + String(temp, 1) + "&field2=" + String(humi, 1); // + "&field3=" + String(moist, 1);
+    client.print("POST /update HTTP/1.1\n");
+    client.print("Host: api.thingspeak.com\n");
+    client.print("Connection: close\n");
+    client.print("X-THINGSPEAKAPIKEY: " + writeAPIKey + "\n");
+    client.print("Content-Type: application/x-www-form-urlencoded\n");
+    client.print("Content-Length: ");
+    client.print(body.length());
+    client.print("\n\n");
+    client.print(body);
+    client.print("\n\n");
+    Serial.println("uploaded to Thingspeak server....");
+  }
+  client.stop();
+}
+
+void setup() {
+  Serial.begin(115200);
+  //Serial.setTimeout(2000);
+
+  // Wait for serial to initialize.
+  while(!Serial) { }
+  
+  Serial.println("device is in Wake up mode");
+  
+  //connect();
+  
+  // Khoi tao webserver de cau hinh wifi
+  // WiFiManager
+  // Local intialization. Once its business is done, there is no need to keep it around
+  WiFiManager wifiManager;
+   
+  // Uncomment and run it once, if you want to erase all the stored information
+  //wifiManager.resetSettings();
+  
+  // set custom ip for portal
+  //wifiManager.setAPConfig(IPAddress(10,0,1,1), IPAddress(10,0,1,1), IPAddress(255,255,255,0));
+
+  // fetches ssid and pass from eeprom and tries to connect
+  // if it does not connect it starts an access point with the specified name
+  // here  "AutoConnectAP"
+  // and goes into a blocking loop awaiting configuration
+  wifiManager.autoConnect("AutoConnectAP");
+  // or use this for auto generated name ESP + ChipID
+  //wifiManager.autoConnect();
+  
+  WiFi.setAutoReconnect(true);
+  WiFi.persistent(true);
+  
+  // if you get here you have connected to the WiFi
+  Serial.println("NodeMcu connected to wifi...");
+
+  Serial.print("RSSI: ");
+  Serial.println(WiFi.RSSI());
+  
+  //server.begin();
+
+  dht.begin();
+  temp   = dht.readTemperature();
+  humi  = dht.readHumidity();
+  Serial.printf("Temp: %s°C - Hum: %s%%\r\n", String(temp, 1).c_str(), String(humi, 1).c_str());
+  
+  thingConnect();
+
+  // Deep sleep mode for 30 seconds, the ESP8266 wakes up by itself when GPIO 16 (D0 in NodeMCU board) is connected to the RESET pin
+  Serial.println("I'm awake, but I'm going into deep sleep mode for 30 seconds");
+  ESP.deepSleep(30e6); 
+  
+  // Deep sleep mode until RESET pin is connected to a LOW signal (for example pushbutton or magnetic reed switch)
+  //Serial.println("I'm awake, but I'm going into deep sleep mode until RESET pin is connected to a LOW signal");
+  //ESP.deepSleep(0); 
+}
+
+void loop() {
+}

@@ -1,0 +1,39 @@
+------------------------------------------------------
+[ESP8266 HTTP Client] Gui du lieu len ThingSpeak Server su dung ESP8266
+https://epcb.vn/blogs/news/esp8266-thingspeakserver-gui-du-lieu-len-thingspeakserver-su-dung-esp8266
+------------------------------------------------------
+Part 1: TAO SERVER
+Step 1: Sign up https://thingspeak.com/
+Step 2: Tao Channel moi
++ Tai Channels tab --> New Channels
++ Nhap Name, Description va cac truong du lieu se gui tu ESP8266 Device len Server (Field), vi du: Temp, Humi. Tich chon dau tich ben phai de cho phep truong du lieu hoat dong --> Save Channel.
+Step 3: Lay Channel ID, Write API key, Read API key
++ Tai API Keys tab --> Luu cac thong tin Channel ID, Write API key, Read API key
+
+--> Du_an_begin
++ Channel ID = 1642597
++ Write API key = MEYECQ4OREXM0UI8
++ Read API key = 26NFYGCQM1NPIEHQ
+
+Part 2: Build mach va source code cho ESP8266
+Vidu:
++ Mach WiFi ESP8266 CP2102 NodeMCU
++ Cam bien nhiet do, do am giao tiep OneWire AM2301
++ Cam bien do am dat (loai ADC)
+Step 1: Build mach
+Ket noi AM2301 voi ESP8266:
+- Chan mau do (VVC) cam vao ngo ra 3.3V cua ESP8266
+- Chan mau den (GND) cam vao ngo ra GND cua ESP8266
+- Chan mau vang (Data) cam vao chan GPIO cua board, su dung chan D2
+Ket noi cam bien do am dat ADC voi ESP8266:
+- Chan mau do (VVC) cam vao ngo ra 3.3V cua ESP8266
+- Chan mau den (GND) cam vao ngo ra GND cua ESP8266
+- Chan du lieu su dung chan ADC = A0 vi board chi co 1 ngo vao ADC.
+Step 2: Build source code cho ESP8266 tren Arduino IDE
++ Tai source code mau tai https://github.com/VVCi/ESP8266HTTPServer , mo file writeDataSensor de built va nap code
++ Thay doi cac tham so trong code bang thong so da luu o Part 1: SSID / password, channelID / writeAPI key
++ Build và nap Code cho board ESP8266, mo Serial Monitor/Terminal, cac gia tri cam bien se hien thi
+------------------------------------------------------
+[ESP8266 HTTP Client] Lay du lieu tu ThingSpeak va tuy chinh giao dien dep mat
+https://epcb.vn/blogs/news/esp8266-http-server-tuy-chinh-giao-dien-thingspeakserver-va-lay-du-lieu-su-dung-esp8266
+------------------------------------------------------

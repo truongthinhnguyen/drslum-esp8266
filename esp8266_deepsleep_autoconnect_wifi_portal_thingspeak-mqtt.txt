@@ -1,0 +1,89 @@
+//wifi autoconnect and portal
+#include <ESP8266WiFi.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>         // https://github.com/tzapu/WiFiManager
+//one-wire for sensor
+#include <SimpleDHT.h> // DHT 11 sensor
+//mqtt
+#include <PubSubClient.h> // MQTT
+
+#define sleepTimeS 600 //10 min Time between updates
+// --- PINOUT ---
+const int temp_sensor_pin = 2;
+
+const char* mqtt_server = "mqtt3.thingspeak.com";
+String temperature_topic = "channels/1642597/publish/fields/field1/MEYECQ4OREXM0UI8";
+String humidity_topic = "channels/1642597/publish/fields/field2/MEYECQ4OREXM0UI8";
+
+// Set web server port number to 80
+WiFiServer server(80);
+
+// Variable to store the HTTP request
+String header;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+long lastMsg = 0;
+char msg[50];
+int value = 0;
+byte temperature;
+byte humidity;
+SimpleDHT11 temp_sensor_obj;
+
+//const int channelID    = 1642597; // Enter Channel ID;
+//String writeAPIKey    = "MEYECQ4OREXM0UI8";
+//const char* server_api    = "api.thingspeak.com";
+
+void setup() {
+  Serial.begin(115200);
+
+  // Wait for serial to initialize.
+  while(!Serial) { }
+  Serial.println("device is in Wake up mode");
+
+  // Khoi tao webserver de cau hinh wifi
+  // WiFiManager
+  wifiManager.autoConnect("AutoConnectAP");
+  WiFi.setAutoReconnect(true);
+  WiFi.persistent(true);
+  
+  // if you get here you have connected to the WiFi
+  Serial.println("NodeMcu connected to wifi...");
+
+  Serial.print("RSSI: ");
+  Serial.println(WiFi.RSSI());
+
+  //MQTT
+  client.setServer(mqtt_server, 1883);   
+  // Create a random client ID
+  String clientId = "Ny8TBTgbNyYRLiYlEAsrGQI";
+  String clientUser = "Ny8TBTgbNyYRLiYlEAsrGQI";
+  String clientPass = "+vtvmkebRQ+vw9wDhfQa/FO4";
+  
+  // Attempt to connect
+  if (client.connect(clientId,clientUser, clientPass)) {
+    //Success
+  } else {
+    ESP.deepSleep(sleepTimeS * 1000000);
+  }
+  
+  //Sensor
+  int err = SimpleDHTErrSuccess;
+  if ((err = temp_sensor_obj.read(temp_sensor_pin, &temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
+    ESP.deepSleep(sleepTimeS * 1000000);  
+  }
+  
+  //Send
+  snprintf (msg, 75, "%ld", (int)temperature);
+  client.publish(temperature_topic.c_str(), msg);
+  snprintf (msg, 75, "%ld", (int)humidity);
+  client.publish(humidity_topic.c_str(), msg);
+
+  //Sleep and repeat
+  client.loop(); // MQTT work
+  ESP.deepSleep(sleepTimeS * 1000000);  
+}
+
+void loop() {
+}
